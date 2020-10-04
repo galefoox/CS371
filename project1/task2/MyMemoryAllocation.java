@@ -105,10 +105,11 @@ public class MyMemoryAllocation extends MemoryAllocation {
 
 		Iterator iterator = usedList.iterator();
 
+
+
 		while(iterator.hasNext())
 		{
-			// System.out.print(usedList.getThatOffset(usedList.getTail()) + " ");
-			// System.out.println(usedList.getThatSize(usedList.getTail()));
+			iterator.traverse();
 			iterator.next();
 
 		}

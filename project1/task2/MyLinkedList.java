@@ -1,6 +1,4 @@
 import java.util.Iterator;
-import java.util.Comparator;
-
 
 
 
@@ -22,28 +20,7 @@ class MyLinkedList implements Iterable{
 				public Block(int size) { //constructor 
 					this.size = size;
 				}
-				
-				//setters
-				public void setSize(int size)
-				{
-					this.size = size;
-				}
-				
-				public void setOffset(int offset)
-				{
-					this.offset = offset;
-				}
-				
-				//getters
-				public int getSize() 
-				{
-					return size;
-				}
-				
-				public int getOffset()
-				{
-					return offset;
-				}
+
 
 				
 				
@@ -64,29 +41,12 @@ class MyLinkedList implements Iterable{
 					this.data = data;
 				}
 				
-				
-				public void setNext(Node current, Node next)
+				public String toString()
 				{
-					current.next = next;
-				
-				}
-				
-				public Node getNextNode()
-				{
-					return next;
-				}
-				
-				public Block getBlock()
-				{
-					return data;
-				}
-				public void setBlock(Block data)
-				{
-					this.data = data;
+					
+					return "Offset: " + data.offset + " Size: " + data.size; 
 				}
 
-				
-				//set block?
 				
 				
 			}
@@ -121,14 +81,14 @@ class MyLinkedList implements Iterable{
 	}
 	public int getThatOffset(Node freeOff)
 	{
-		return freeOff.getBlock().getOffset();
+		return freeOff.data.offset;
 		
 	}
 	public void setFreeNode(int theOff, int theSize)
 	{
 		Node offNode = head;
-		offNode.getBlock().setOffset(theOff);
-		offNode.getBlock().setSize(theSize);
+		offNode.data.offset = theOff;
+		offNode.data.size = theSize;
 
 		// We are changing the offset and the size 
 		// base off of what we put into the parameters
@@ -136,9 +96,13 @@ class MyLinkedList implements Iterable{
 	}
 	public int getThatSize (Node nodeOff)
 	{
-		return nodeOff.getBlock().getSize();
+		return nodeOff.data.size;
 	}
-
+	public void traverse(Node tempr)
+	{
+		tempr = tempr.next;
+		System.out.println(tempr);
+	}
 		
 	
 	
@@ -146,7 +110,7 @@ class MyLinkedList implements Iterable{
 		
 
 		Block newData = new Block(num); //create new block
-		newData.setOffset(off); // set offset
+		newData.offset = off; // set offset
 	    Node newNode = new Node(newData); //now create the new node
 
 		if (head == null)
@@ -156,39 +120,37 @@ class MyLinkedList implements Iterable{
 		}
 		else
 		{
-			tail.setNext(tail, newNode);
-			tail = tail.getNextNode();
+			tail.next = newNode;
+			tail = tail.next;
 		}
 		
 }
 	
-	public Node sortIt()
+	public void sortIt()
 	{
 
 		
 		Node index = head;
 		Node current = head;
 		Block temp;
-		while (index.getNextNode() != null)
+		while (index.next != null)
 		{
-			while (current.getNextNode() != null)
+			while (current.next != null)
 			{
-				if (current.getBlock().getOffset() > current.getNextNode().getBlock().getOffset())
+				if (current.data.offset > current.next.data.offset)
 				{
-					temp = current.getBlock();
-					current.setBlock(current.getNextNode().getBlock());
-					current.getNextNode().setBlock(temp);
+					temp = current.data;
+					current.data = current.next.data;
+					current.next.data = temp;
 						
 				}
-				current = current.getNextNode();
-			//	current.setNext(current, current.getNextNode());	WHY NO WORK
+				current = current.next;
+			
 			}
-			index = index.getNextNode();
+			index = index.next;
 			
 		}
 
-
-		return head;
 	}
 		
 
@@ -199,7 +161,7 @@ class MyLinkedList implements Iterable{
 		return new Iterator<Block>(){
 
 			Node current = head;
-
+			Block data;
 			@Override
 			public boolean hasNext() {
 				return current!= null;
@@ -208,26 +170,20 @@ class MyLinkedList implements Iterable{
 			@Override 
 			public Block next() {
 				if(hasNext()) {
-
-					Block data = current.getBlock();
-					
-					System.out.print(current.data.offset + " ");
-					System.out.println(current.data.size);
-					current = current.getNextNode();
+	
+					data = current.data;
+					current = current.next;
 					
 					return data;
 				}
 
 				return null;
 			}
-
-			// public String toString() {
-
-			// 	String block_offset = "Offset: " + current.getBlock().getOffset();
-
-			// 	return block_offset;
-			// }
-
+			public void traverse()
+			{
+				System.out.println(head);
+				head = head.next;
+			}
 
 
 	};

@@ -9,7 +9,7 @@ public class MemDriver{
 		trial.alloc(2);
 		trial.alloc(7);
 		trial.alloc(3);
-		trial.print();
+	
 		
 	}
 		

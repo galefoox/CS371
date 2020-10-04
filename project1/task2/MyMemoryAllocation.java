@@ -23,45 +23,61 @@ public class MyMemoryAllocation extends MemoryAllocation {
 		// TODO Auto-generated method stub
 
 		// MAKE SURE TO INCLUDE THAT THE FREE OFFSET CANT BE BIGGER THAN THE MEM SIZE
-
+		if(algorithm.equals("FF"))
+		{
+			
+			return FirstFit(size);
+		}
+		
+		else if(algorithm.equals("NF"))
+		{
+			return NextFit(size); //FINISSHHH LATERRRRR
+		}
+			
+			
+			
+}
+	
+	public int FirstFit(int size)
+	{
 		if (freeList == null || size > totalSizeAvail )
 		{
 			System.out.println("Not enough available space");
 			return 0;
 		}
+		
 		else
 		{
 			int offset;
 			int usedListOff;
 			int usedListSize;
-			offset = freeList.getThatOffset(freeList.getHead());
+			offset = freeList.getThatOffsetInitial();
 			usedList.insert(size, offset);//Insert Node into used list
-			usedListOff = usedList.getThatOffset(usedList.getTail());
-			usedListSize = usedList.getThatSize(usedList.getTail());
-			freeList.setFreeNode(usedListOff + size, usedListSize);
+			usedListOff = usedList.getThatOffsetRemaining();
+			usedListSize = usedList.getThatSizeRemaining();
+			freeList.setFirstFreeNode(usedListOff + size, usedListSize);
 			usedList.sortIt();
+			
+			//System.out.println("initial size: " + totalSizeAvail);
+			
 			totalSizeAvail = size();
+			
+			System.out.println("TotalSizeAvail: " + totalSizeAvail);
+			
 			return offset;
-			//keep the offset
-			//update the size
-			//Update size and offset of freelist
 		}
-
-		//SortedInsert()
-		/* so basically she will pass some number into alloc and then we will take
-		 * that value and put it into block and then pass block into insert for the 
-		 * linked list
-		 * 
-		 * put if else statement
-		 * if: free linked list/max size > size (in alloc) then you insert block 
-		 * else: no space avail
-		 * 
-		 * make new block 
-		 * put size into block 
-		 * put offset into block
-		 * call function insert
-		 */
 	}
+	
+	public int NextFit(int size)
+	{
+		int offset = FirstFit(size);
+		return offset;
+		
+		//FINISHHH LATERRRRRR
+	}
+
+		
+	
 
 	@Override
 	public void free(int addr) {
@@ -73,24 +89,18 @@ public class MyMemoryAllocation extends MemoryAllocation {
 
 	@Override
 	public int size() { // Keeps track of the total memory we're using
-		// TODO Auto-generated method stub
-		int usedSize = 0;
+		
+		int totalUsedSize = 0;
 		Iterator iterator = usedList.iterator();
-		if (iterator.hasNext() == false)
+		
+		while(iterator.hasNext())
 		{
-			usedSize = usedList.getThatSize(usedList.getHead());
-			totalSizeAvail = totalSizeAvail - usedSize;
+			totalUsedSize = usedList.getThatSizeRemaining();
+			iterator.next();
 		}
-		else
-		{
-			while (iterator.hasNext())
-			{
-				usedSize = usedSize + usedList.getThatSize(usedList.getTail());
-				iterator.next();
-
-			}
-		totalSizeAvail = totalSizeAvail - usedSize;
-		}
+		
+		totalSizeAvail -= totalUsedSize;
+		
 		return totalSizeAvail;
 	}
 
@@ -109,8 +119,8 @@ public class MyMemoryAllocation extends MemoryAllocation {
 
 		while(iterator.hasNext())
 		{
-			iterator.traverse();
-			iterator.next();
+			
+			System.out.println(iterator.next());
 
 		}
 		

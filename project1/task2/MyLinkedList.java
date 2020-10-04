@@ -20,6 +20,13 @@ class MyLinkedList implements Iterable{
 				public Block(int size) { //constructor 
 					this.size = size;
 				}
+				
+				public String toString()
+				{
+					
+					return "Offset: " + offset + " Size: " + size; 
+				}
+
 
 
 				
@@ -73,18 +80,39 @@ class MyLinkedList implements Iterable{
 	{ 
 		return tail; 
 	}
-	public void firstBlock(int num)
+	
+	public void firstBlock(int num) 
 	{
-		Block tempBlock = new Block(num, 1);
+		Block tempBlock = new Block(num, 1); //13
 		head = new Node(tempBlock);
 
 	}
-	public int getThatOffset(Node freeOff)
+	
+	public int getThatOffsetRemaining()
 	{
-		return freeOff.data.offset;
+		return tail.data.offset;
 		
 	}
-	public void setFreeNode(int theOff, int theSize)
+	
+	public int getThatOffsetInitial()
+	{
+		return head.data.offset;
+		
+	}
+	
+	
+	public int getThatSizeInitial ()//Node nodeOff)
+	{
+		//return nodeOff.data.size;
+		return head.data.size;
+	}
+	
+	public int getThatSizeRemaining()
+	{
+		return tail.data.size;
+	}
+	
+	public void setFirstFreeNode(int theOff, int theSize)
 	{
 		Node offNode = head;
 		offNode.data.offset = theOff;
@@ -94,15 +122,14 @@ class MyLinkedList implements Iterable{
 		// base off of what we put into the parameters
 
 	}
-	public int getThatSize (Node nodeOff)
-	{
-		return nodeOff.data.size;
-	}
-	public void traverse(Node tempr)
-	{
-		tempr = tempr.next;
-		System.out.println(tempr);
-	}
+	
+//	public void traverse(Node tempr)
+//	{
+//		tempr = tempr.next;
+//		System.out.println(tempr);
+//	}
+	
+
 		
 	
 	
@@ -174,16 +201,20 @@ class MyLinkedList implements Iterable{
 					data = current.data;
 					current = current.next;
 					
+					
 					return data;
 				}
 
 				return null;
 			}
-			public void traverse()
-			{
-				System.out.println(head);
-				head = head.next;
-			}
+			
+//			public Node traverse()
+//			{
+//				current = head;
+//				current = head.next;
+//				
+//				return current;
+//			}
 
 
 	};

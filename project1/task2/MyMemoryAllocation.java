@@ -38,7 +38,7 @@ public class MyMemoryAllocation extends MemoryAllocation {
 
 
 
-
+		
 		return offset;
 		
 		
@@ -63,13 +63,14 @@ public class MyMemoryAllocation extends MemoryAllocation {
 		{
 			 int offset;
 			// int usedListOff;
-			// int usedListSize;
+			 int usedListSize;
 			offset = freeList.getThatOffsetInitial();
 			usedList.insert(size, offset);//Insert Node into used list
-			// usedListOff = usedList.getThatOffsetRemaining();
-			// usedListSize = usedList.getThatSizeRemaining();
+			 //usedListOff = usedList.getThatOffsetRemaining();
+			 usedListSize = usedList.getThatSizeRemaining();
+			// int splitSize = totalSizeAvail - usedListSize;
 			// freeList.setFirstFreeNode(usedListOff + size, totalSizeAvail - usedListSize);
-			freeList.
+			freeList.splitMayDelete(usedList.getUsedListMatch(offset));
 
 			usedList.sortIt();
 

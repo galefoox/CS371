@@ -1,4 +1,7 @@
 import java.util.Iterator;
+
+import javax.lang.model.util.ElementScanner14;
+
 import java.util.Comparator;
 
 
@@ -202,10 +205,10 @@ class MyLinkedList implements Iterable{
 				current = current.next;
 			
 			}
-			// if (index.data.size == 0)
-			// {
-			// 	delete(index.data.offset);
-			// }
+			if (index.data.size == 0)
+			{
+				delete(index.data.offset);
+			}
 
 			index = index.next;
 			
@@ -214,18 +217,22 @@ class MyLinkedList implements Iterable{
 	}
 	public void splitMayDelete(Block num)
 	{
-		Iterator freeListTemp = new iterator();
-		Comparator compare = new Comparator<Block>();
-	
-
-		while (freeListTemp.hasNext())
+		Node temp = head;
+		// CHeck if FreeList has enough size
+		while (temp != null)
 		{
-			if (compare.compare(num, freeListTemp.next()) <= 0)
+			if (temp.data.size >= num.size)
 			{
-	
+				temp.data.size = temp.data.size - num.size;
+				temp.data.offset = temp.data.offset + num.size;
 			}
-
+			else
+			{
+				System.out.println("Not enough space");
+			}
+			temp = temp.next;
 		}
+		// Update FreeList offset and size or DELETE 
 	}
 
 	public void delete(int addy)

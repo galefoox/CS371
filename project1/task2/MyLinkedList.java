@@ -1,14 +1,12 @@
 import java.util.Iterator;
-
-import javax.lang.model.util.ElementScanner14;
-
-import java.util.Comparator;
+//import java.util.Comparator;
 
 
 class MyLinkedList implements Iterable{	
 //make private and use getters and setters 
 	 private Node head; 
 	 private Node tail;
+	 private Node nfNode;
 	
 			//data used inside of Node
 			private class Block {
@@ -117,7 +115,14 @@ class MyLinkedList implements Iterable{
 	
 	public int getThatSizeRemaining()
 	{
-		return tail.data.size;
+		Node usedHead = head;
+		int sumOfUsedSize = 0;
+		while (usedHead != null)
+		{
+			sumOfUsedSize = sumOfUsedSize + usedHead.data.size;
+			usedHead = usedHead.next;
+		}
+		return sumOfUsedSize;
 	}
 	
 	public void setFirstFreeNode(int theOff, int theSize)
@@ -131,7 +136,8 @@ class MyLinkedList implements Iterable{
 
 	}
 
-	public Block getUsedListMatch(int addr)
+	// Checks for any of the usedList that matches the address
+	public Block getUsedListMatch(int addr) 
 	{
 		Node usedListTemp = head;
 		Block dataSub = usedListTemp.data;
@@ -151,15 +157,32 @@ class MyLinkedList implements Iterable{
 		return dataSub;
 
 	}
-
-	
-//	public void traverse(Node tempr)
-//	{
-//		tempr = tempr.next;
-//		System.out.println(tempr);
-//	}
-	
-
+	public int checkUsedOffset(int addr)
+	{
+		Node usedListHead = head;
+		int usedOffset = 0;
+		while (usedListHead != null)
+		{
+			if (usedListHead.data.offset == addr)
+			{
+				usedOffset = usedListHead.data.offset;
+			}
+			usedListHead = usedListHead.next;
+		}
+		return usedOffset;
+	}
+	public void removeEmptyBlock()
+	{
+		Node temp = head;
+		while (temp != null)
+		{
+			if (temp.data.size == 0)
+			{
+				delete(temp.data.offset);
+			}
+			temp = temp.next;
+		}
+	}
 		
 	
 	
@@ -168,19 +191,25 @@ class MyLinkedList implements Iterable{
 
 		Block newData = new Block(num); //create new block
 		newData.offset = off; // set offset
-	    Node newNode = new Node(newData); //now create the new node
+		Node newNode = new Node(newData); //now create the new node
+		Node temp = head;
 
-		if (head == null)
+		if (temp == null)
 		{
 			head = newNode;
 			tail = newNode;
 		}
 		else
-		{
-			tail.next = newNode;
-			tail = tail.next;
+		{	
+			while (temp.next != null)
+			{
+				temp = temp.next;
+			}
+			temp.next = newNode;
+			tail = temp.next;
+
 		}
-		sortIt();
+
 }
 	
 	public void sortIt()
@@ -205,35 +234,45 @@ class MyLinkedList implements Iterable{
 				current = current.next;
 			
 			}
-			if (index.data.size == 0)
-			{
-				delete(index.data.offset);
-			}
 
 			index = index.next;
 			
 		}
 
 	}
-	public void splitMayDelete(Block num)
+	public void splitMayDelete(int size, String algo)
 	{
 		Node temp = head;
 		// CHeck if FreeList has enough size
-		while (temp != null)
+		if (algo.contentEquals("NF"))
 		{
-			if (temp.data.size >= num.size)
-			{
-				temp.data.size = temp.data.size - num.size;
-				temp.data.offset = temp.data.offset + num.size;
-			}
-			else
-			{
-				System.out.println("Not enough space");
-			}
-			temp = temp.next;
+			temp = nfNode;
+	
 		}
+		while (temp != null)
+			{
+
+				if (temp.data.size >= size)
+				{
+					temp.data.size = temp.data.size - size;
+					temp.data.offset = temp.data.offset + size;
+					nfNode = temp;
+					break;
+				}
+				else
+				{
+					System.out.println("Not enough space");
+				}
+
+
+
+				temp = temp.next;
+			}
+			removeEmptyBlock();
+		}
+	
 		// Update FreeList offset and size or DELETE 
-	}
+	
 
 	public void delete(int addy)
 	{
@@ -252,7 +291,7 @@ class MyLinkedList implements Iterable{
 			
 				if (traverse.next.data.offset == addy)	// If it equals the offset then delete
 				{
-					System.out.println(traverse.data.offset);
+
 					traverse.next = traverse.next.next;
 				}
 	
@@ -261,6 +300,7 @@ class MyLinkedList implements Iterable{
 					
 					traverse = traverse.next;
 				}
+				
 				temp = temp.next;
 			
 	
@@ -270,42 +310,33 @@ class MyLinkedList implements Iterable{
 
 	public void insertMayCompact(Block temp)
 	{
-		
-		// int size = 0;
-		
+		insert(temp.size, temp.offset);
+		mayMerge();
 
-		// while (temp != null)
-		// {
-		// 	if (temp.data.offset == free)
-		// 	{
-		// 		size = temp.data.size;
-				insert(temp.size, temp.offset);
-			//	mayMerge(temp);
-		// 		break;
-		// 	}
-		// 	temp = temp.next;
-		// }
-		sortIt();
 	}
-	public void mayMerge(Node node)
+	public void mayMerge()
 	{
-		if (node.data.offset + node.data.size == node.next.data.offset)
+		Node currentNode = head;
+		Node temp;
+		while (currentNode != null)
 		{
-			node.data.size = node.data.size + node.next.data.size;
-			node.next = node.next.next;
-		}
-	}
 
-
-	public class ByOffset implements Comparator<Block>
-	{
-		@Override
-		public int compare(Block lhs, Block rhs)
-		{
-			return Integer.compare(lhs.offset, rhs.offset);
+			temp = currentNode.next;
+	
+			
+			while (temp != null)
+			{
+				if (currentNode.data.offset + currentNode.data.size == temp.data.offset)
+				{
+					currentNode.data.size = currentNode.data.size + temp.data.size;
+					delete(temp.data.offset);
+				}
+				temp = temp.next;
+			}
+			currentNode = currentNode.next;
 		}
+
 	}
-		
 
 
 
@@ -326,6 +357,7 @@ class MyLinkedList implements Iterable{
 	
 					data = current.data;
 					current = current.next;
+					
 					
 					
 					return data;

@@ -1,4 +1,7 @@
+
 import java.util.Iterator;
+
+
 
 public class MyMemoryAllocation extends MemoryAllocation {
 	
@@ -7,7 +10,7 @@ public class MyMemoryAllocation extends MemoryAllocation {
 	private MyLinkedList usedList;
 	private MyLinkedList freeList;
 	private int totalSizeAvail;
-	private int totalUsedSize;
+	
 	
 
 	public MyMemoryAllocation(int mem_size, String algorithm) {
@@ -29,11 +32,19 @@ public class MyMemoryAllocation extends MemoryAllocation {
 		
 		
 		int offset = 0;
-
+		size();
 		if(algo.contentEquals("FF"))
 		{
 			offset = FirstFit(size);
 		
+		}
+		else if (algo.contentEquals("BF"))
+		{
+			offset = BestFit(size);
+		}
+		else
+		{
+			offset = NextFit(size);
 		}
 
 
@@ -50,10 +61,33 @@ public class MyMemoryAllocation extends MemoryAllocation {
 			
 			
 }
+	public int BestFit(int size)
+	{
+		if (freeList == null || size > max_size() )
+		{
+			System.out.println("Not enough available space");
+			return 0;
+		}
+	
+		else
+		{
+			 int offset;	
+
+			offset = freeList.getThatOffsetInitial();
+			usedList.insert(size, offset);//Insert Node into used list
+			freeList.splitMayDelete(size, algo);
+
+
+			usedList.sortIt();
+			freeList.sortIt();
+		
+			return offset;
+		}
+	}
 	
 	public int FirstFit(int size)
 	{
-		if (freeList == null || size > totalSizeAvail )
+		if (freeList == null || size > max_size() )
 		{
 			System.out.println("Not enough available space");
 			return 0;
@@ -62,36 +96,45 @@ public class MyMemoryAllocation extends MemoryAllocation {
 		else
 		{
 			 int offset;
-			// int usedListOff;
-			 int usedListSize;
+
 			offset = freeList.getThatOffsetInitial();
 			usedList.insert(size, offset);//Insert Node into used list
-			 //usedListOff = usedList.getThatOffsetRemaining();
-			 usedListSize = usedList.getThatSizeRemaining();
-			// int splitSize = totalSizeAvail - usedListSize;
-			// freeList.setFirstFreeNode(usedListOff + size, totalSizeAvail - usedListSize);
-			freeList.splitMayDelete(usedList.getUsedListMatch(offset));
+			freeList.splitMayDelete(size, algo);
+
 
 			usedList.sortIt();
 
-			
-			//System.out.println("initial size: " + totalSizeAvail);
-			
-			totalSizeAvail = size();
-			
-			System.out.println("TotalSizeAvail: " + totalSizeAvail);
 			
 			return offset;
 		}
 	}
 	
-	// public int NextFit(int size)
-	// {
-	// 	int offset = FirstFit(size);
-	// 	return offset;
-		
-	// 	//FINISHHH LATERRRRRR
-	// }
+	public int NextFit(int size)
+	{
+		{
+			if (freeList == null || size > max_size() )
+			{
+				System.out.println("Not enough available space");
+				return 0;
+			}
+			
+			else
+			{
+				 int offset;
+	
+				offset = freeList.getThatOffsetInitial();
+				usedList.insert(size, offset);//Insert Node into used list
+				freeList.splitMayDelete(size, algo);
+	
+	
+				usedList.sortIt();
+	
+				
+				return offset;
+			}
+	}
+}
+
 
 		
 	
@@ -102,10 +145,29 @@ public class MyMemoryAllocation extends MemoryAllocation {
 	
 		// TODO Auto-generated method stub
 		/* if FF, */
-		freeList.insertMayCompact(usedList.getUsedListMatch(addr));
-		usedList.delete(addr);
-		
-		size();
+		// check if the free addy is valid
+
+		if (usedList.checkUsedOffset(addr) != addr)
+		{
+			System.out.println("No such offset");
+		}
+		//insert free addy
+		else if (algo.contentEquals("FF") || algo.contentEquals("NF"))
+		{
+			freeList.insertMayCompact(usedList.getUsedListMatch(addr));
+			usedList.delete(addr);
+			
+			totalSizeAvail = size();
+		}
+		else
+		{
+			freeList.insertMayCompact(usedList.getUsedListMatch(addr));
+			usedList.delete(addr);
+			
+			totalSizeAvail = size();
+			freeList.sortIt();
+		}
+
 		
 
 		//insert to freeList
@@ -115,25 +177,31 @@ public class MyMemoryAllocation extends MemoryAllocation {
 	@Override
 	public int size() { // Keeps track of the total memory we're using
 		
-	
 
-		Iterator iterator = usedList.iterator();
-		
-		while(iterator.hasNext())
-		{
-			totalUsedSize = usedList.getThatSizeRemaining();
-			iterator.next();
-		}
-		
-		totalSizeAvail -= totalUsedSize;
+		totalSizeAvail = freeList.getThatSizeRemaining();
+		System.out.println("TotalSizeAvail: " + totalSizeAvail);
+
 		
 		return totalSizeAvail;
 	}
 
 	@Override
 	public int max_size() {
-		// TODO Auto-generated method stub
-		return 0;
+		Iterator iterator = freeList.iterator();
+		
+		
+		int biggestSize = 0;
+		while (iterator.hasNext())
+		{
+			if (biggestSize < freeList.getThatSizeInitial())
+			{
+				biggestSize = freeList.getThatSizeInitial();
+			}
+			iterator.next();
+			
+		}
+	
+		return biggestSize;
 	}
 
 	@Override
@@ -158,14 +226,5 @@ public class MyMemoryAllocation extends MemoryAllocation {
 		}
 		
 	}
-
-	/*
-	 * Allocates memory with defined size. 
-         * If the memory is evailable the function returns pointer (offset) of the begining of allocated memory. 
-         * Otherwise it returns 0.
-	 */
-	
-	//MyLinkedList list = new MyLinkedList();
-	
 	
 }

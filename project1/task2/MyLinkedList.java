@@ -67,17 +67,20 @@ class MyLinkedList implements Iterable{
 	 
 	
 	//CHANGE BACK TO ONE T
-	public MyLinkedList() //constructor 
-	{
-		head = null;
-		tail = null;
-	}
+	// public MyLinkedList() //constructor 
+	// {
+	// 	head = null;
+	// 	tail = null;
+	// }
 
-	
+	public boolean isEmpty()
+	{
+		return head == null;
+	}
 	// return Head 
-	public Node getHead() 
+	public Node thatNext() 
 	{ 
-		return head; 
+		return head.next; 
 	} 
 			
 	// return Tail 
@@ -183,7 +186,15 @@ class MyLinkedList implements Iterable{
 			temp = temp.next;
 		}
 	}
-		
+	public int thatNF()
+	{
+
+		if(nfNode == null )
+		{
+			nfNode = head;
+		}
+		return nfNode.data.offset;
+	}
 	
 	
 	public void insert(int num, int off){
@@ -193,7 +204,7 @@ class MyLinkedList implements Iterable{
 		newData.offset = off; // set offset
 		Node newNode = new Node(newData); //now create the new node
 		Node temp = head;
-
+		
 		if (temp == null)
 		{
 			head = newNode;
@@ -229,8 +240,9 @@ class MyLinkedList implements Iterable{
 					temp = current.data;
 					current.data = current.next.data;
 					current.next.data = temp;
-						
+					sortIt();
 				}
+
 				current = current.next;
 			
 			}
@@ -247,7 +259,11 @@ class MyLinkedList implements Iterable{
 		if (algo.contentEquals("NF"))
 		{
 			temp = nfNode;
-	
+			if (temp == null)
+			{
+				temp = head;
+			}
+
 		}
 		while (temp != null)
 			{
@@ -256,7 +272,7 @@ class MyLinkedList implements Iterable{
 				{
 					temp.data.size = temp.data.size - size;
 					temp.data.offset = temp.data.offset + size;
-					nfNode = temp;
+					nfNode = temp.next;
 					break;
 				}
 				else
@@ -363,10 +379,9 @@ class MyLinkedList implements Iterable{
 					return data;
 				}
 
+
 				return null;
 			}
-			
-
 
 	};
 

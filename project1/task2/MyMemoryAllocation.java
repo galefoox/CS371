@@ -10,6 +10,7 @@ public class MyMemoryAllocation extends MemoryAllocation {
 	private MyLinkedList usedList;
 	private MyLinkedList freeList;
 	private int totalSizeAvail;
+	private int maxSize;
 	
 	
 
@@ -20,6 +21,7 @@ public class MyMemoryAllocation extends MemoryAllocation {
 		freeList.firstBlock(mem_size - 1);
 		totalSizeAvail = mem_size - 1;
 		algo = algorithm;
+		maxSize = totalSizeAvail;
 		//initialize linked list here (all data initialized here)!!!
 	}
 	
@@ -29,11 +31,15 @@ public class MyMemoryAllocation extends MemoryAllocation {
 		// TODO Auto-generated method stub
 
 		// MAKE SURE TO INCLUDE THAT THE FREE OFFSET CANT BE BIGGER THAN THE MEM SIZE
-		
-		
 		int offset = 0;
-		size();
-		if(algo.contentEquals("FF"))
+
+		if (freeList == null || size > maxSize )
+		{
+			System.out.println("Not enough available space");
+			return 0;
+		}
+
+		else if(algo.contentEquals("FF"))
 		{
 			offset = FirstFit(size);
 		
@@ -46,32 +52,14 @@ public class MyMemoryAllocation extends MemoryAllocation {
 		{
 			offset = NextFit(size);
 		}
-
-
-
-		
+		maxSize = max_size();
 		return offset;
-		
-		
-		// else if(algorithm.equals("NF"))
-		// {
-		// 	return NextFit(size); //FINISSHHH LATERRRRR
-		// }
-			
-			
 			
 }
 	public int BestFit(int size)
 	{
-		if (freeList == null || size > max_size() )
-		{
-			System.out.println("Not enough available space");
-			return 0;
-		}
-	
-		else
-		{
-			 int offset;	
+
+			int offset;	
 
 			offset = freeList.getThatOffsetInitial();
 			usedList.insert(size, offset);//Insert Node into used list
@@ -82,19 +70,12 @@ public class MyMemoryAllocation extends MemoryAllocation {
 			freeList.sortIt();
 		
 			return offset;
-		}
+
 	}
 	
 	public int FirstFit(int size)
 	{
-		if (freeList == null || size > max_size() )
-		{
-			System.out.println("Not enough available space");
-			return 0;
-		}
-		
-		else
-		{
+
 			 int offset;
 
 			offset = freeList.getThatOffsetInitial();
@@ -106,34 +87,34 @@ public class MyMemoryAllocation extends MemoryAllocation {
 
 			
 			return offset;
-		}
+		
 	}
 	
 	public int NextFit(int size)
 	{
-		{
-			if (freeList == null || size > max_size() )
+			int offset;
+			
+			if (usedList.isEmpty())
 			{
-				System.out.println("Not enough available space");
-				return 0;
+				offset = freeList.getThatOffsetInitial();
+				usedList.insert(size, offset);
+				freeList.splitMayDelete(size, algo);
+				
 			}
 			
 			else
 			{
-				 int offset;
-	
-				offset = freeList.getThatOffsetInitial();
-				usedList.insert(size, offset);//Insert Node into used list
-				freeList.splitMayDelete(size, algo);
-	
-	
-				usedList.sortIt();
-	
-				
-				return offset;
+					offset = freeList.thatNF();
+					usedList.insert(size, offset);
+					freeList.splitMayDelete(size, algo);
+			
 			}
+			usedList.sortIt();
+			
+			
+			return offset;
 	}
-}
+
 
 
 		
@@ -179,7 +160,7 @@ public class MyMemoryAllocation extends MemoryAllocation {
 		
 
 		totalSizeAvail = freeList.getThatSizeRemaining();
-		System.out.println("TotalSizeAvail: " + totalSizeAvail);
+	//	System.out.println("TotalSizeAvail: " + totalSizeAvail);
 
 		
 		return totalSizeAvail;
@@ -200,7 +181,7 @@ public class MyMemoryAllocation extends MemoryAllocation {
 			iterator.next();
 			
 		}
-	
+		//System.out.println("Max size: " + biggestSize);
 		return biggestSize;
 	}
 

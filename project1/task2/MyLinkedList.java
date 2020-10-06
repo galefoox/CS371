@@ -9,9 +9,9 @@ class MyLinkedList implements Iterable{
 	 private Node nfNode;
 	
 			//data used inside of Node
-			private class Block {
-				private int size;
-				private int offset; 
+			public class Block {
+				public int size;
+				public int offset; 
 				
 				public Block(int size, int offset) { //constructor 
 					this.size = size;
@@ -315,7 +315,8 @@ class MyLinkedList implements Iterable{
 		}
 		while (temp != null)
 			{
-
+			/*
+			 */
 				if (temp.data.size >= size)
 				{
 					temp.data.size = temp.data.size - size;
@@ -374,6 +375,15 @@ class MyLinkedList implements Iterable{
 
 	public void insertMayCompact(Block temp)
 	{
+		/*my idea is this - 
+		 * hold a temp=sum of the firstNodesOffse + firstNodesSize and compare this temp
+		 * to the offset of every other node in the list
+		 * if the this temp=sum matches, then we compact
+		 * 
+		 * call itself so that it can return to the beginning each time to check
+		 * 
+		 */
+		
 		insert(temp.size, temp.offset);
 		mayMerge();
 
@@ -403,7 +413,7 @@ class MyLinkedList implements Iterable{
 
 	}
 
-
+	
 
 	@Override
 	public Iterator<Block> iterator() {
@@ -411,6 +421,7 @@ class MyLinkedList implements Iterable{
 
 			Node current = head;
 			Block data;
+			int size;
 			@Override
 			public boolean hasNext() {
 				return current!= null;
@@ -419,7 +430,7 @@ class MyLinkedList implements Iterable{
 			@Override 
 			public Block next() {
 				if(hasNext()) {
-	
+					
 					data = current.data;
 					current = current.next;
 					
@@ -431,6 +442,8 @@ class MyLinkedList implements Iterable{
 
 				return null;
 			}
+			
+			
 
 	};
 
@@ -454,25 +467,6 @@ class MyLinkedList implements Iterable{
 
 
 
-
-
-		
-		//have a linked list ? maybe ? yeah?
-		//from there go to and start implementing functions
-		//test files - calls mymemalloc mylinkedlist
-		//so in alloc function - should be implementing linkedlist
-		//alloc(int size)
-		//free(address) which i think is offset - offset vs address? maybe offset and address = same
-		/* so insert may consolidate i wrote in my notes - "when you free a block and need to
-		 * insert node, you need to merge them with address - i think this is referring to when say a block on
-		 * the right is free and then you free the block next to it, we want to merge them and make one big block
-		 * 
-		 * also - she said when you do insert, you are not allowed to delete the two nodes and add 1 thats like a combo of both
-		 * 
-		 * her class byOffset is just a sorter
-		 */
-
-	
 	
 
 		

@@ -3,6 +3,7 @@ import java.util.Iterator;
 
 
 
+
 public class MyMemoryAllocation extends MemoryAllocation {
 	
 
@@ -159,36 +160,83 @@ public class MyMemoryAllocation extends MemoryAllocation {
 	}
 
 	@Override
-	public int size() { // Keeps track of the total memory we're using
+	public int size() { // Keeps track of the total memory we're using //sum of avail parts of mem
 		
-
-		totalSizeAvail = freeList.getThatSizeRemaining();
-	//	System.out.println("TotalSizeAvail: " + totalSizeAvail);
-
+		int totalSize = 0;
 		
-		return totalSizeAvail;
+		Iterator<MyLinkedList.Block> iterator = freeList.iterator();
+		MyLinkedList.Block firstBlock = iterator.next(); 
+		 
+		int availSize = firstBlock.size;
+		
+		while(iterator.hasNext())
+		{
+			MyLinkedList.Block next = iterator.next();
+			availSize += next.size;
+		}
+		
+		return availSize;
+		
+		
+		
+//		totalSizeAvail = freeList.getThatSizeRemaining();
+//	//	System.out.println("TotalSizeAvail: " + totalSizeAvail);
+//
+//		
+//		return totalSizeAvail;
 	}
 
 	@Override
 	public int max_size() {
-		// Iterator iterator = freeList.iterator();
 		
-		int biggestSize = 0;
-		biggestSize = freeList.getMaxSize();
-		// int biggestSize = 0;
-		// while (iterator.hasNext())
-		// {
-		// 	if (biggestSize < freeList.getThatSizeInitial())
-		// 	{
-		// 		biggestSize = freeList.getThatSizeInitial();
-		// 	}
-		// 	iterator.next();
+		
+		 Iterator<MyLinkedList.Block> iterator = freeList.iterator();
+		 MyLinkedList.Block maxSizeBlock = iterator.next(); 
+		 
+		 int maxSize = maxSizeBlock.size;
+		 
+		 while(iterator.hasNext())
+		 {
+			 MyLinkedList.Block temp = iterator.next(); 
+			 
+			 if(temp.size > maxSizeBlock.size)
+			 {
+				 maxSize = temp.size;
+			 }
+			 
 			
-		// }
-		// System.out.println("Max size: " + biggestSize);
-		return biggestSize;
+		 }
+		 
+		 return maxSize;
+		 
+//		 int maxSize = freeList.getThatSizeInitial();
+//		
+//		 freeList.sortItSize();
+//		 
+//		while(iterator.hasNext())
+//		{
+//			
+//			maxSize = iterator.next();
+//		}
+		
+//		int biggestSize = 0;
+//		biggestSize = freeList.getMaxSize();
+//		return biggestSize;
 	}
-
+//		// int biggestSize = 0;
+//		// while (iterator.hasNext())
+//		// {
+//		// 	if (biggestSize < freeList.getThatSizeInitial())
+//		// 	{
+//		// 		biggestSize = freeList.getThatSizeInitial();
+//		// 	}
+//		// 	iterator.next();
+//			
+//		// }
+//		// System.out.println("Max size: " + biggestSize);
+//		return biggestSize;
+	
+	
 	@Override
 	public void print() {
 
@@ -209,8 +257,8 @@ public class MyMemoryAllocation extends MemoryAllocation {
 			System.out.println(iterator2.next());
 
 		}
-		System.out.print("Max Size: " + maxSize + " ");
-		System.out.println("Total Size: " +totalSizeAvail);
+		System.out.print("Max Size: " + max_size() + " ");
+		System.out.println("Total Size: " + size());
 
 	}
 	

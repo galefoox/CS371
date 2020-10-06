@@ -221,8 +221,25 @@ class MyLinkedList implements Iterable{
 
 		}
 
-}
+	}
+
+	public int getMaxSize()
+	{
+		Node temp = head;
 	
+		int max = head.data.size;
+		while (temp.next != null)
+		{
+			if (max < temp.next.data.size )
+			{
+				max = temp.next.data.size;	
+				
+			}
+
+			temp = temp.next;
+		}
+		return max;
+	}
 	public void sortIt()
 	{
 
@@ -252,9 +269,40 @@ class MyLinkedList implements Iterable{
 		}
 
 	}
+	public void sortItSize()
+	{
+
+		
+		Node index = head;
+		Node current = head;
+		Block temp;
+		while (index != null)
+		{
+
+			while (current.next != null)
+			{
+				if (current.data.size > current.next.data.size)
+				{
+					temp = current.data;
+					current.data = current.next.data;
+					current.next.data = temp;
+					sortItSize();
+				}
+
+				current = current.next;
+			
+			}
+
+			index = index.next;
+			
+		}
+
+	}
+
 	public void splitMayDelete(int size, String algo)
 	{
 		Node temp = head;
+		
 		// CHeck if FreeList has enough size
 		if (algo.contentEquals("NF"))
 		{
@@ -272,7 +320,7 @@ class MyLinkedList implements Iterable{
 				{
 					temp.data.size = temp.data.size - size;
 					temp.data.offset = temp.data.offset + size;
-					nfNode = temp.next;
+					nfNode = temp.next;		
 					break;
 				}
 				else
@@ -333,22 +381,23 @@ class MyLinkedList implements Iterable{
 	public void mayMerge()
 	{
 		Node currentNode = head;
-		Node temp;
+		Node temp = currentNode;
 		while (currentNode != null)
 		{
 
-			temp = currentNode.next;
-	
-			
 			while (temp != null)
 			{
+				// If the added offset + size = ANY of the offset values in the freeList, then combine
+				// MUST FIX THIS
 				if (currentNode.data.offset + currentNode.data.size == temp.data.offset)
 				{
 					currentNode.data.size = currentNode.data.size + temp.data.size;
 					delete(temp.data.offset);
+					mayMerge();
 				}
 				temp = temp.next;
 			}
+			temp = currentNode.next;
 			currentNode = currentNode.next;
 		}
 

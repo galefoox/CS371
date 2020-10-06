@@ -32,7 +32,8 @@ public class MyMemoryAllocation extends MemoryAllocation {
 
 		// MAKE SURE TO INCLUDE THAT THE FREE OFFSET CANT BE BIGGER THAN THE MEM SIZE
 		int offset = 0;
-
+	
+		maxSize = max_size();
 		if (freeList == null || size > maxSize )
 		{
 			System.out.println("Not enough available space");
@@ -52,7 +53,8 @@ public class MyMemoryAllocation extends MemoryAllocation {
 		{
 			offset = NextFit(size);
 		}
-		maxSize = max_size();
+		
+		totalSizeAvail = size();
 		return offset;
 			
 }
@@ -67,7 +69,7 @@ public class MyMemoryAllocation extends MemoryAllocation {
 
 
 			usedList.sortIt();
-			freeList.sortIt();
+			freeList.sortItSize();
 		
 			return offset;
 
@@ -105,9 +107,9 @@ public class MyMemoryAllocation extends MemoryAllocation {
 			else
 			{
 					offset = freeList.thatNF();
-					usedList.insert(size, offset);
 					freeList.splitMayDelete(size, algo);
-			
+					usedList.insert(size, offset);
+		
 			}
 			usedList.sortIt();
 			
@@ -130,7 +132,7 @@ public class MyMemoryAllocation extends MemoryAllocation {
 
 		if (usedList.checkUsedOffset(addr) != addr)
 		{
-			System.out.println("No such offset");
+			System.err.println("No such offset");
 		}
 		//insert free addy
 		else if (algo.contentEquals("FF") || algo.contentEquals("NF"))
@@ -145,10 +147,11 @@ public class MyMemoryAllocation extends MemoryAllocation {
 			freeList.insertMayCompact(usedList.getUsedListMatch(addr));
 			usedList.delete(addr);
 			
-			totalSizeAvail = size();
-			freeList.sortIt();
-		}
 
+			freeList.sortItSize();
+		}
+		maxSize = max_size();
+		totalSizeAvail = size();
 		
 
 		//insert to freeList
@@ -168,20 +171,21 @@ public class MyMemoryAllocation extends MemoryAllocation {
 
 	@Override
 	public int max_size() {
-		Iterator iterator = freeList.iterator();
-		
+		// Iterator iterator = freeList.iterator();
 		
 		int biggestSize = 0;
-		while (iterator.hasNext())
-		{
-			if (biggestSize < freeList.getThatSizeInitial())
-			{
-				biggestSize = freeList.getThatSizeInitial();
-			}
-			iterator.next();
+		biggestSize = freeList.getMaxSize();
+		// int biggestSize = 0;
+		// while (iterator.hasNext())
+		// {
+		// 	if (biggestSize < freeList.getThatSizeInitial())
+		// 	{
+		// 		biggestSize = freeList.getThatSizeInitial();
+		// 	}
+		// 	iterator.next();
 			
-		}
-		//System.out.println("Max size: " + biggestSize);
+		// }
+		// System.out.println("Max size: " + biggestSize);
 		return biggestSize;
 	}
 
@@ -205,7 +209,9 @@ public class MyMemoryAllocation extends MemoryAllocation {
 			System.out.println(iterator2.next());
 
 		}
-		
+		System.out.print("Max Size: " + maxSize + " ");
+		System.out.println("Total Size: " +totalSizeAvail);
+
 	}
 	
 }

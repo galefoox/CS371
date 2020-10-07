@@ -1,6 +1,8 @@
 
 import java.util.Iterator;
 
+import javax.lang.model.util.ElementScanner14;
+
 
 
 
@@ -64,9 +66,10 @@ public class MyMemoryAllocation extends MemoryAllocation {
 
 			int offset;	
 
-			offset = freeList.getThatOffsetInitial();
-			usedList.insert(size, offset);//Insert Node into used list
 			freeList.splitMayDelete(size, algo);
+			offset = freeList.getThatOffset();
+			usedList.insert(size, offset);//Insert Node into used list
+			
 
 
 			usedList.sortIt();
@@ -81,9 +84,10 @@ public class MyMemoryAllocation extends MemoryAllocation {
 
 			 int offset;
 
-			offset = freeList.getThatOffsetInitial();
-			usedList.insert(size, offset);//Insert Node into used list
+			//Insert Node into used list
 			freeList.splitMayDelete(size, algo);
+			offset = freeList.getThatOffset();
+			usedList.insert(size, offset);
 
 
 			usedList.sortIt();
@@ -107,10 +111,10 @@ public class MyMemoryAllocation extends MemoryAllocation {
 			
 			else
 			{
-					offset = freeList.thatNF();
 					freeList.splitMayDelete(size, algo);
+					offset = freeList.getThatOffset();
 					usedList.insert(size, offset);
-		
+					
 			}
 			usedList.sortIt();
 			
@@ -126,117 +130,122 @@ public class MyMemoryAllocation extends MemoryAllocation {
 	@Override
 	public void free(int addr) {
 
-	
-		// TODO Auto-generated method stub
-		/* if FF, */
-		// check if the free addy is valid
 
-		if (usedList.checkUsedOffset(addr) != addr)
+		
+		Iterator<MyLinkedList.Block> iterator = usedList.iterator();
+		MyLinkedList.Block temp = iterator.next();
+		int usedOffset = 0;
+
+		if (temp.offset == addr)
 		{
-			System.err.println("No such offset");
-		}
-		//insert free addy
-		else if (algo.contentEquals("FF") || algo.contentEquals("NF"))
-		{
-			freeList.insertMayCompact(usedList.getUsedListMatch(addr));
-			usedList.delete(addr);
-			
-			totalSizeAvail = size();
+			usedOffset = temp.offset;
 		}
 		else
 		{
-			freeList.insertMayCompact(usedList.getUsedListMatch(addr));
-			usedList.delete(addr);
-			
+			while (iterator.hasNext())
+			{
+				temp = iterator.next();
+				if (temp.offset == addr)
+				{
+					usedOffset = temp.offset;
+					break;
+				}
+			}
+		}
 
+		if (usedOffset != addr)
+		{
+			System.err.println("No such offset");
+		}
+		else if (algo.contentEquals("BF"))
+		{
+			freeList.insertMayCompact(temp);
+			usedList.delete(addr);
 			freeList.sortItSize();
+		}
+		else
+		{
+			freeList.insertMayCompact(temp);
+			usedList.delete(addr);
 		}
 		maxSize = max_size();
 		totalSizeAvail = size();
-		
 
 		//insert to freeList
 		//delete from usedList
 	}
 
 	@Override
-	public int size() { // Keeps track of the total memory we're using //sum of avail parts of mem
-		
-		int totalSize = 0;
-		
-		Iterator<MyLinkedList.Block> iterator = freeList.iterator();
-		MyLinkedList.Block firstBlock = iterator.next(); 
-		 
-		int availSize = firstBlock.size;
-		
-		while(iterator.hasNext())
-		{
-			MyLinkedList.Block next = iterator.next();
-			availSize += next.size;
-		}
-		
-		return availSize;
-		
-		
-		
-//		totalSizeAvail = freeList.getThatSizeRemaining();
-//	//	System.out.println("TotalSizeAvail: " + totalSizeAvail);
+    public int size() { // Keeps track of the total memory we're using //sum of avail parts of mem
+
+
+        Iterator<MyLinkedList.Block> iterator = freeList.iterator();
+
+        MyLinkedList.Block firstBlock = iterator.next(); 
+        int availSize;
+
+        if(firstBlock == null)
+        {
+            availSize = 0;
+        }
+        else
+        {
+            availSize = firstBlock.size;
+        }
+
+        while(iterator.hasNext())
+        {
+            MyLinkedList.Block next = iterator.next();
+            availSize += next.size;
+        }
+
+        return availSize;
+
+
+
+//        totalSizeAvail = freeList.getThatSizeRemaining();
+//    //    System.out.println("TotalSizeAvail: " + totalSizeAvail);
 //
-//		
-//		return totalSizeAvail;
+//
+//        return totalSizeAvail;
+    }
+
+
+@Override
+public int max_size() {
+
+
+	 Iterator<MyLinkedList.Block> iterator = freeList.iterator();
+	 MyLinkedList.Block maxSizeBlock = iterator.next(); 
+
+	 int maxSize;
+
+	 if(maxSizeBlock == null)
+		{
+			maxSize = 0;
+		}
+		else
+		{
+			maxSize = maxSizeBlock.size;
+		}
+
+
+	 while(iterator.hasNext())
+	 {
+		 MyLinkedList.Block temp = iterator.next(); 
+
+		 if(temp.size > maxSizeBlock.size)
+		 {
+			 maxSize = temp.size;
+		 }
+
+
+	 }
+
+	 return maxSize;
 	}
 
-	@Override
-	public int max_size() {
-		
-		
-		 Iterator<MyLinkedList.Block> iterator = freeList.iterator();
-		 MyLinkedList.Block maxSizeBlock = iterator.next(); 
-		 
-		 int maxSize = maxSizeBlock.size;
-		 
-		 while(iterator.hasNext())
-		 {
-			 MyLinkedList.Block temp = iterator.next(); 
-			 
-			 if(temp.size > maxSizeBlock.size)
-			 {
-				 maxSize = temp.size;
-			 }
-			 
-			
-		 }
-		 
-		 return maxSize;
-		 
-//		 int maxSize = freeList.getThatSizeInitial();
-//		
-//		 freeList.sortItSize();
-//		 
-//		while(iterator.hasNext())
-//		{
-//			
-//			maxSize = iterator.next();
-//		}
-		
-//		int biggestSize = 0;
-//		biggestSize = freeList.getMaxSize();
-//		return biggestSize;
-	}
-//		// int biggestSize = 0;
-//		// while (iterator.hasNext())
-//		// {
-//		// 	if (biggestSize < freeList.getThatSizeInitial())
-//		// 	{
-//		// 		biggestSize = freeList.getThatSizeInitial();
-//		// 	}
-//		// 	iterator.next();
-//			
-//		// }
-//		// System.out.println("Max size: " + biggestSize);
-//		return biggestSize;
-	
-	
+
 	@Override
 	public void print() {
 

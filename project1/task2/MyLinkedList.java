@@ -7,6 +7,7 @@ class MyLinkedList implements Iterable{
 	 private Node head; 
 	 private Node tail;
 	 private Node nfNode;
+	 private int thatOffset;
 	
 			//data used inside of Node
 			public class Block {
@@ -103,9 +104,9 @@ class MyLinkedList implements Iterable{
 		
 	}
 	
-	public int getThatOffsetInitial()
+	public int getThatOffset()
 	{
-		return head.data.offset;
+		return thatOffset;
 		
 	}
 	
@@ -188,12 +189,20 @@ class MyLinkedList implements Iterable{
 	}
 	public int thatNF()
 	{
-
-		if(nfNode == null )
+		if (nfNode.next == null)
 		{
 			nfNode = head;
+			return nfNode.data.offset;
 		}
-		return nfNode.data.offset;
+		else
+		{
+			return nfNode.next.data.offset;
+		}
+		
+	}
+	public int getThatOffsetInitial()
+	{
+		return head.data.offset;
 	}
 	
 	
@@ -302,41 +311,37 @@ class MyLinkedList implements Iterable{
 	public void splitMayDelete(int size, String algo)
 	{
 		Node temp = head;
+
 		
 		// CHeck if FreeList has enough size
 		if (algo.contentEquals("NF"))
 		{
-			temp = nfNode;
-			if (temp == null)
+			temp = nfNode; // SETS WHERE WE LEFT OFF AT
+			if (temp == null) 
 			{
-				temp = head;
+				temp  = head;
 			}
 
 		}
 		while (temp != null)
 			{
-			/*
-			 */
+
 				if (temp.data.size >= size)
 				{
+					thatOffset = temp.data.offset;
+					nfNode = temp.next;
 					temp.data.size = temp.data.size - size;
 					temp.data.offset = temp.data.offset + size;
-					nfNode = temp.next;		
 					break;
 				}
-				else
-				{
-					System.out.println("Not enough space");
-				}
 
-
-
-				temp = temp.next;
+					temp = temp.next;
+			
+				
+		
 			}
 			removeEmptyBlock();
 		}
-	
-		// Update FreeList offset and size or DELETE 
 	
 
 	public void delete(int addy)
@@ -405,6 +410,12 @@ class MyLinkedList implements Iterable{
 					delete(temp.data.offset);
 					mayMerge();
 				}
+				else if (temp.data.offset + temp.data.size == currentNode.data.offset)
+				{
+					temp.data.size = temp.data.size + currentNode.data.size;
+					delete(currentNode.data.offset);
+					mayMerge();
+				}
 				temp = temp.next;
 			}
 			temp = currentNode.next;
@@ -421,7 +432,7 @@ class MyLinkedList implements Iterable{
 
 			Node current = head;
 			Block data;
-			int size;
+	
 			@Override
 			public boolean hasNext() {
 				return current!= null;

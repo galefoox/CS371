@@ -4,51 +4,55 @@ If you mark the task “N”, it receives 25% of max possible points for the tas
 If you leave it blank, it receives 0 points. 
 If your mark the task ""A"" or ""P"" but zero work is done for the task, then it receives 0 points.
 Please leave ""score"" cells blank for course staff
-If your code does not build,  your code will not receive more than 50% of max possible points",,,,,
-,,,,,
-,,,,,
-Task1,Max score (%),Your answer/Your self-evalution,1st pass: autograder ,2nd pass: manual review,final score
-How many system calls are placed in total by each HelloWorld program?,4,27 syscalls for the HelloWorld.c and 2618 sysclass for the HelloWorld.java,0,,0
-"How many different system calls (i.e., counting only one occurrence of a particular system call) are placed by each HelloWorld program? ",4,12 different syscalls for HelloWorld.c and 46 different syscalls for HelloWorld.java,0,,0
-"Based on your intuition, on reading man pages, and on the information in the trace files, pick three system calls placed by the Java HelloWorld program and say what you think they do (hint: use man). ",4,"[1] mkdir(): attempts to create a new directory. [2] ftruncate(): causes a file to be truncated to a size of a certain amount of bytes. [3] brk(): changes data segment size; noted to avoide considering malloc() is the more ""comfortable"" way of allocating memory.",0,,0
-"In lecture, we discussed how C library translates a C lib function such as open to sys_open. It is easy to understand how this works for a C program. However, does this still apply to Java programs? State your reasoning with evidence.",4,"Yes, this applies to Java programs as well. We discussed in class User Land vs. Kernel Land and library functions are implemented in user mode and are then translated to be implemented in kernel mode. The evidence is shown in the checked in trace file for the C on line 34 and the Java trace file on line 2941 with the write() sys call on both. The Java file has a list of system calls just like that of the C file - system calls are the only way that an OS allows access to the program.",0,,0
-is tracefile_c generated and checked in?,2,Yes ,0,,0
-is tracefile_java generated and checked in?,2,Yes ,0,,0
-,,,,Total,0
-,,,,,
-Task2,Max score (%),Your answer/Your self-evalution,1st pass: autograder,2nd pass: manual review,final score
-Is constructor implemented correctly? ,5,A,,,
+If your code does not build,  your code will not receive more than 50% of max possible points",,,,,,
+,,,,,,
+,,,,,,
+Task1,Max score (%),Your answer/Your self-evalution,1st pass: autograder ,2nd pass: manual review,final score,
+How many system calls are placed in total by each HelloWorld program?,4,27 syscalls for the HelloWorld.c and 2618 sysclass for the HelloWorld.java,0,4,4,
+"How many different system calls (i.e., counting only one occurrence of a particular system call) are placed by each HelloWorld program? ",4,12 different syscalls for HelloWorld.c and 46 different syscalls for HelloWorld.java,0,4,4,
+"Based on your intuition, on reading man pages, and on the information in the trace files, pick three system calls placed by the Java HelloWorld program and say what you think they do (hint: use man). ",4,"[1] mkdir(): attempts to create a new directory. [2] ftruncate(): causes a file to be truncated to a size of a certain amount of bytes. [3] brk(): changes data segment size; noted to avoide considering malloc() is the more ""comfortable"" way of allocating memory.",0,4,4,
+"In lecture, we discussed how C library translates a C lib function such as open to sys_open. It is easy to understand how this works for a C program. However, does this still apply to Java programs? State your reasoning with evidence.",4,"Yes, this applies to Java programs as well. We discussed in class User Land vs. Kernel Land and library functions are implemented in user mode and are then translated to be implemented in kernel mode. The evidence is shown in the checked in trace file for the C on line 34 and the Java trace file on line 2941 with the write() sys call on both. The Java file has a list of system calls just like that of the C file - system calls are the only way that an OS allows access to the program.",0,4,4,
+is tracefile_c generated and checked in?,2,Yes ,0,2,2,
+is tracefile_java generated and checked in?,2,Yes ,0,2,2,
+,,,,Total,20,
+,,,,,,
+Task2,Max score (%),Your answer/Your self-evalution,1st pass: autograder,2nd pass: manual review,final score,
+Is constructor implemented correctly? ,5,A,,,,
 "Is allocate implemented correctly? Does it support
          -- first fit?
          -- best fit?
          -- next fit?
-Does it use list of free blocks and used blocks? and uses own linked list to split/delete blocks?",30,A,,,
+Does it use list of free blocks and used blocks? and uses own linked list to split/delete blocks?",30,A,,"-10
+see comments inlined. In particular, the comments with #design tags
+-5
+Failing to maintain/sort freeList in the order of offset. Impl 
+Worked around the requirement by using inefficient merge.see #failing-requirements",,
 "Is free implemented correctly?
        -- Does it compact free space?
        -- Does it give a nice error if you free a silly address?
-       -- Use your own linked list to insert and perhaps consolidate blocks?",15,A,,,
-Is size implemented correctly? ,5,A,,,
-Is max_size implemented correctly? ,5,A,,,
+       -- Use your own linked list to insert and perhaps consolidate blocks?",15,A,,,,
+Is size implemented correctly? ,5,A,,,,
+Is max_size implemented correctly? ,5,A,,,,
 "Is free and used blocks tracked using your own linked list?   
-      -- Can your program output a list of used and free sections in offset order ?",10,A,,,
-,,,,,0
-Task3,Max score (%),Your answer/Your self-evalution,1st pass: autograder,2nd pass: manual review,final score
-Your github repo should be named “CS371”;,"10% total
+      -- Can your program output a list of used and free sections in offset order ?",10,A,,,,
+,,,,,55,
+Task3,Max score (%),Your answer/Your self-evalution,1st pass: autograder,2nd pass: manual review,final score,
+Your github repo should be named “CS371”,,"10% total
 
 missing any one - 5%
 missing two or more - 0%",A,,,0
-"Your github repo CS371 must be private, and you must add the instructor(jyuan2pace) as a collaborator;  ",,A,,,0
-"All your work for this project should be placed under directory “project1”, which is immediately under repo CS371;",,A,,,0
-The trace files for task 1 should be immediately under a folder called task1 immediately under project1; ,,A,,,0
-The source code for task 2 should be immediately under a folder called task2 immediately under project1;,,A,,,0
-This completed grading sheet should be under the folder project1,,A,,,
-,,,,Total,0
-Penalty,,,,,
-Late submission penalty,,,,,
-missing commits from any member,,,,,
-,,,,Total,0
-Extra credits,,,,,
-TBD,,,,,
-TBD,,,,,
-,,,,Total,0
-Final total score,,,,,
+"Your github repo CS371 must be private, and you must add the instructor(jyuan2pace) as a collaborator;  ",,A,,,0,
+"All your work for this project should be placed under directory “project1”, which is immediately under repo CS371;",,A,,,0,
+The trace files for task 1 should be immediately under a folder called task1 immediately under project1, ,,A,,,0
+The source code for task 2 should be immediately under a folder called task2 immediately under project1,,,A,,,0
+This completed grading sheet should be under the folder project1,,A,,,,
+,,,,Total,10,
+Penalty,,,,,,
+Late submission penalty,,,,,,
+missing commits from any member,,,,,Cleaning up dir or checking grading sheet is not considered a commit of “commiting to one procedure”,
+,,,,Total,-17,
+Extra credits,,,,,,
+TBD,,,,,,
+TBD,,,,,,
+,,,,Total,68,
+Final total score,,,,,,

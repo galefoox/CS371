@@ -226,6 +226,32 @@ class MyLinkedList implements Iterable {
 		}
 	}
 
+	public void sortUsedList() {
+		// Credits:
+		// https://www.javatpoint.com/program-to-sort-the-elements-of-the-singly-linked-list
+		// Node current will point to head
+		Node current = head, index = null;
+		Block temp;
+
+		while (current != null) {
+			// Node index will point to node next to current
+			index = current.next;
+
+			while (index != null) {
+				// If current node's data is greater than index's node data, swap the data
+				// between them
+				if (current.data.offset > current.next.data.offset) {
+					temp = current.data;
+					current.data = index.data;
+					index.data = temp;
+					sortUsedList();
+				}
+				index = index.next;
+			}
+			current = current.next;
+		}
+	}
+
 	public void sortItSize() {
 
 		Node index = head;
@@ -257,7 +283,7 @@ class MyLinkedList implements Iterable {
 		// CHeck if FreeList has enough size
 		if (algo.contentEquals("NF")) {
 			temp = nfNode; // SETS WHERE WE LEFT OFF AT
-			if (temp == null) {
+			if (temp == null || temp.next == null) {
 				temp = head;
 			}
 

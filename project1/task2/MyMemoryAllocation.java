@@ -117,7 +117,7 @@ public class MyMemoryAllocation extends MemoryAllocation {
 					
 			}
 			usedList.sortIt();
-			
+			freeList.sortIt();
 			
 			return offset;
 	}

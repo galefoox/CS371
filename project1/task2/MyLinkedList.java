@@ -249,35 +249,35 @@ class MyLinkedList implements Iterable{
 		}
 		return max;
 	}
-	public void sortIt()
-	{
 
-		
-		Node index = head;
-		Node current = head;
-		Block temp;
-		while (index != null)
-		{
+	public void sortIt() {  
+		//Credits: https://www.javatpoint.com/program-to-sort-the-elements-of-the-singly-linked-list
+        //Node current will point to head  
+        Node current = head, index = null;  
+        Block temp;  
+          
+        if(head == null) {  
+            return;  
+        }  
+        else {  
+            while(current != null) {  
+                //Node index will point to node next to current  
+                index = current.next;  
+                  
+                while(index != null) {  
+                    //If current node's data is greater than index's node data, swap the data between them  
+                    if(current.data.offset > current.next.data.offset) {  
+                        temp = current.data;  
+                        current.data = index.data;  
+                        index.data = temp;  
+                    }  
+                    index = index.next;  
+                }  
+                current = current.next;  
+            }      
+        }  
+    }  
 
-			while (current.next != null)
-			{
-				if (current.data.offset > current.next.data.offset)
-				{
-					temp = current.data;
-					current.data = current.next.data;
-					current.next.data = temp;
-					sortIt();
-				}
-
-				current = current.next;
-			
-			}
-
-			index = index.next;
-			
-		}
-
-	}
 	public void sortItSize()
 	{
 

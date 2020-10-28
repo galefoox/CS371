@@ -1,0 +1,13 @@
+jun discussion about bios
+
+Apparently BIOS loads some very basic interrupt vectors in. What are them?  What do you think are the reasons other interrupts are not widely 
+supported in BIOS?
+Some basic interrupt vectors the BIOS loads are video, disk, serial port, and keyboard. My assumption regarding why other interrupts are not
+ widely supported is similar to Jacks answer. These interrupts are, I would assume, most common therefore the space reserved in the RAM should be for those.
+ It would not make sense to waste space in the 1KB for an uncommon interrupt that is not widely used. 
+
+2. In class, your professor argued OS is not responsible for saving/restoring registers of the interrupted process during interrupt handling. 
+Although the conclusion may be correct, one argument your professor made is that interrupts could exist before any OS was introduced. 
+This is intentionally debatable. Please defeat your professor by arguing BIOS works sort of like an OS and should be treated as one. 
+The more fierce, the better.
+

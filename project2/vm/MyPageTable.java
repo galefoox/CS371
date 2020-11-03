@@ -4,7 +4,12 @@ import java.util.Objects;
 
 public class MyPageTable {
 
-    class PageTableEntry {
+    private static int INITIAL_SIZE = 256;
+    // Correct way of
+    LinkedList<PageTableEntry> temp[] = new LinkedList[INITIAL_SIZE];
+    LinkedList<PageTableEntry> dirtyBits = new LinkedList<PageTableEntry>();
+
+    static class PageTableEntry {
         int vpn;
         int pfn;
         boolean dirtyBit;
@@ -15,57 +20,31 @@ public class MyPageTable {
             this.dirtyBit = dirtyBit;
         }
 
-        public void setPFN(int pfn) {
-            this.pfn = pfn;
-        }
-
-        public int getPFN() {
-            return pfn;
-        }
-
-        public void setVPN(int vpn) {
-            this.vpn = vpn;
-        }
-
-        public int getVPN() {
+        public int getVpn() {
             return vpn;
         }
 
-        public String toString() {
-
-            return "VPN " + vpn + " PFN " + pfn + " DirtyBit " + dirtyBit;
-        }
-
-        public void setAll(int vpn, int pfn, boolean dirtyBit) {
-            this.vpn = vpn;
-            this.pfn = pfn;
-            this.dirtyBit = dirtyBit;
+        public int getPfn() {
+            return pfn;
         }
 
     }
-
-    private static int INITIAL_SIZE = 10;
-    // Correct way of
-    LinkedList<PageTableEntry> temp[] = new LinkedList[INITIAL_SIZE];
 
     public MyPageTable() {
 
         for (int i = 0; i < INITIAL_SIZE; i++) {
 
             temp[i] = new LinkedList<PageTableEntry>();
-            for (int j = 0; j < 4; j++) {
-                PageTableEntry boop = new PageTableEntry(j, j, true);
-                temp[i].add(boop);
 
-            }
         }
-
     }
 
-    public int containsVPN(int address) {
+    public void addEntry(int index, PageTableEntry entry) {
+        temp[index].add(entry);
+        dirtyBits.add(entry);
+    }
 
-        int index = address % INITIAL_SIZE;
-        int vpn = address / INITIAL_SIZE;
+    public int containsVPN(int vpn, int index) {
 
         // Check for the matching Index
 
@@ -78,19 +57,18 @@ public class MyPageTable {
         // ITERATES THROUGH THE WHOLE LIST
         ListIterator<PageTableEntry> iter = null;
         PageTableEntry tempBoop = temp[index].getFirst(); // Sets the head to traverse
-
-        iter = temp[index].listIterator(); // Sets iter to the temp to iterate
         int count = 0;
+        iter = temp[index].listIterator(); // Sets iter to the temp to iterate
         while (iter.hasNext()) {
             tempBoop = temp[index].get(count);
-            if (tempBoop.getVPN() == vpn) { // If VPN matches then find the PFN
-                return tempBoop.getPFN(); // Return PFN
+            if (tempBoop.vpn == vpn) { // If VPN matches then find the PFN
+                return tempBoop.pfn; // Return PFN
             } else {
                 count++;
                 iter.next(); // Traverse if not
             }
         }
-        return 100;
+        return -1;
 
     }
 
@@ -110,6 +88,10 @@ public class MyPageTable {
         System.out.println("Table Entry 1: " + temp[1].toString());
         System.out.println("Table Entry 8: " + temp[8].toString());
 
+    }
+
+    protected LinkedList<PageTableEntry> returnDirtyList() {
+        return dirtyBits;
     }
 
 }

@@ -27,9 +27,9 @@ public class VirtMemory extends Memory {
     }
 
     PhyMemory theRam = new PhyMemory();
+    Policy policyPFN = new Policy(theRam.num_frames());
     private int getThatPFN;
     private int pAddy;
-    private int maxFrames;
     MyPageTable hashTable = new MyPageTable();
     EvictionStatus evictTemp;
     int writeBackCounter = 0;
@@ -42,31 +42,33 @@ public class VirtMemory extends Memory {
     @Override
     public void write(int address, byte value) {
 
-        int index = address % 64; // HashCode
+        int offset = address % 64; // HashCode
         int vpn = address / 64;
 
         // Consider pagefault
-        maxFrames = theRam.num_frames();
-        if (address >= maxFrames) {
+        // maxFrames = theRam.num_frames();
+        if (address >= theRam.num_frames()) {
             System.err.print("Out of Bounds");
         }
 
         else {
 
-            Policy policyPFN = new Policy(maxFrames);
             evictTemp = policyPFN.advise();
 
             // PUT INSIDE PTE
             MyPageTable.PageTableEntry oof = new MyPageTable.PageTableEntry(vpn, evictTemp.evictPFN,
                     evictTemp.dirtyBit);
-            hashTable.addEntry(index, oof);
+            hashTable.addEntry(vpn, oof);
 
             // load from PhyMemory
             // call Policy to get PFN
-            pAddy = evictTemp.evictPFN * 64 + index;
+            pAddy = evictTemp.evictPFN * 64 + offset;
             theRam.load(vpn, pAddy); // blockNum = VPN, startAddr = PFN * 64 or table_Size
             if (writeBackCounter == 32) {
                 write_back();
+                // NOTE:
+                // ADJUST THIS RETHINK THE IF STATEMENT - DEPENDS ON EVICTION
+                // WRTIEBACKCOUNTER = 0;
             }
             theRam.write(pAddy, value); // Write to PhyMemory
             theRam.store(vpn, pAddy); // Store to disk
@@ -79,7 +81,7 @@ public class VirtMemory extends Memory {
     @Override
     public byte read(int virtAddy) {
 
-        int index = virtAddy % 64; // HashCode
+        int offset = virtAddy % 64; // HashCode
         int vpn = virtAddy / 64;
         int hashTablePFN = -1;
 
@@ -90,7 +92,7 @@ public class VirtMemory extends Memory {
 
         else {
 
-            hashTablePFN = hashTable.containsVPN(vpn, index);
+            hashTablePFN = hashTable.containsVPN(vpn, pfn);
 
             if (hashTablePFN == -1) {
 
@@ -98,7 +100,7 @@ public class VirtMemory extends Memory {
 
                 // Find a PFN to use
                 maxFrames = theRam.num_frames();
-                Policy policyPFN = new Policy(maxFrames);
+
                 evictTemp = policyPFN.advise();
 
                 // Put inside PTE
@@ -131,6 +133,9 @@ public class VirtMemory extends Memory {
         int writeBackVPN;
         LinkedList<MyPageTable.PageTableEntry> tempDirtyList = new LinkedList<MyPageTable.PageTableEntry>();
         tempDirtyList = hashTable.returnDirtyList();
+
+        // MAKE SURE WHEN WE CALL THIS WE RESET WRITEBACKCOUNTER = 0 AND WE NEED TO MAKE
+        // A METHOD INSIDE OF PAGE TABLE TO CLEAR OUT DIRTYBIT LIST
 
         ListIterator<MyPageTable.PageTableEntry> iter = null;
         iter = tempDirtyList.listIterator();

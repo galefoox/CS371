@@ -39,29 +39,20 @@ public class MyPageTable {
         }
     }
 
-    public void addEntry(int index, PageTableEntry entry) {
-        temp[index].add(entry);
+    public void addEntry(int vpn, PageTableEntry entry) {
+        temp[vpn].add(entry);
         dirtyBits.add(entry);
     }
 
-    public int containsVPN(int vpn, int index) {
+    public int containsVPN(int vpn, int pfn) {
 
-        // Check for the matching Index
-
-        // int theSpot = temp[index]..indexOf(vpn); // Gets the index of where the
-        // correct VPN is
-        // PageTableEntry tempBoop; // Makes a temporary Node
-        // tempBoop = temp[index].get(theSpot); // Returns the node at the correct index
-        // to tempBoop
-        // return tempBoop.getPFN();
-        // ITERATES THROUGH THE WHOLE LIST
         ListIterator<PageTableEntry> iter = null;
-        PageTableEntry tempBoop = temp[index].getFirst(); // Sets the head to traverse
+        PageTableEntry tempBoop = temp[vpn].getFirst(); // Sets the head to traverse
         int count = 0;
-        iter = temp[index].listIterator(); // Sets iter to the temp to iterate
+        iter = temp[vpn].listIterator(); // Sets iter to the temp to iterate
         while (iter.hasNext()) {
-            tempBoop = temp[index].get(count);
-            if (tempBoop.vpn == vpn) { // If VPN matches then find the PFN
+            tempBoop = temp[vpn].get(count);
+            if (tempBoop.pfn == pfn) { // If VPN matches then find the PFN
                 return tempBoop.pfn; // Return PFN
             } else {
                 count++;

@@ -44,7 +44,7 @@ public class MyPageTable {
         dirtyBits.add(entry);
     }
 
-    public int containsVPN(int vpn, int pfn) {
+    public int containsVPN(int vpn) {
 
         ListIterator<PageTableEntry> iter = null;
         PageTableEntry tempBoop = temp[vpn].getFirst(); // Sets the head to traverse
@@ -52,7 +52,7 @@ public class MyPageTable {
         iter = temp[vpn].listIterator(); // Sets iter to the temp to iterate
         while (iter.hasNext()) {
             tempBoop = temp[vpn].get(count);
-            if (tempBoop.pfn == pfn) { // If VPN matches then find the PFN
+            if (tempBoop.vpn == vpn) { // If VPN matches then find the PFN
                 return tempBoop.pfn; // Return PFN
             } else {
                 count++;
@@ -83,6 +83,10 @@ public class MyPageTable {
 
     protected LinkedList<PageTableEntry> returnDirtyList() {
         return dirtyBits;
+    }
+
+    protected void resetDirtyList() {
+        dirtyBits.clear();
     }
 
 }

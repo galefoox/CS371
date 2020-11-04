@@ -66,9 +66,6 @@ public class VirtMemory extends Memory {
             theRam.load(vpn, pAddy); // blockNum = VPN, startAddr = PFN * 64 or table_Size
             if (writeBackCounter == 32) {
                 write_back();
-                // NOTE:
-                // ADJUST THIS RETHINK THE IF STATEMENT - DEPENDS ON EVICTION
-                // WRTIEBACKCOUNTER = 0;
             }
             theRam.write(pAddy, value); // Write to PhyMemory
             theRam.store(vpn, pAddy); // Store to disk
@@ -92,14 +89,13 @@ public class VirtMemory extends Memory {
 
         else {
 
-            hashTablePFN = hashTable.containsVPN(vpn, pfn);
+            hashTablePFN = hashTable.containsVPN(vpn);
 
             if (hashTablePFN == -1) {
 
                 System.err.println("Page Fault"); // Cache Miss
 
                 // Find a PFN to use
-                maxFrames = theRam.num_frames();
 
                 evictTemp = policyPFN.advise();
 
@@ -115,9 +111,9 @@ public class VirtMemory extends Memory {
                     System.err.println("No such PFN");
 
                 }
-                pAddy = getThatPFN * 64 + index;
+                pAddy = getThatPFN * 64 + offset;
                 theRam.load(vpn, pAddy);
-                hashTablePFN = hashTable.containsVPN(vpn, index);
+                hashTablePFN = hashTable.containsVPN(vpn);
                 return theRam.read(hashTablePFN);
 
             }
@@ -145,6 +141,8 @@ public class VirtMemory extends Memory {
             writeBackPFN = tempDirtyList.get(countIndex).getPFN();
 
         }
+        writeBackCounter = 0;
+        hashTable.resetDirtyList();
 
     }
 

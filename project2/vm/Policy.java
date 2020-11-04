@@ -19,7 +19,8 @@ public class Policy {
         if (queue.size() != maxFrames) { // It will never be more because we will remove in else
 
             queue.add(queue.size());
-            holdPFN = queue.peek();
+            // holdPFN = queue.peek();
+            holdPFN = queue.size();
         } else {
 
             holdPFN = queue.remove(); // so this evicts but now we need to add to front

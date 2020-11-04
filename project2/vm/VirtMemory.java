@@ -28,9 +28,9 @@ public class VirtMemory extends Memory {
 
     PhyMemory theRam = new PhyMemory();
     Policy policyPFN = new Policy(theRam.num_frames());
-    private int getThatPFN;
-    private int pAddy;
     MyPageTable hashTable = new MyPageTable();
+    private int physAddr;
+    private int startAddr;
     EvictionStatus evictTemp;
     int writeBackCounter = 0;
 
@@ -62,13 +62,16 @@ public class VirtMemory extends Memory {
 
             // load from PhyMemory
             // call Policy to get PFN
-            pAddy = evictTemp.evictPFN * 64 + offset;
-            theRam.load(vpn, pAddy); // blockNum = VPN, startAddr = PFN * 64 or table_Size
+            physAddr = evictTemp.evictPFN * 64 + offset;
+            startAddr = evictTemp.evictPFN * 64; // no offset
+
             if (writeBackCounter == 32) {
                 write_back();
             }
-            theRam.write(pAddy, value); // Write to PhyMemory
-            theRam.store(vpn, pAddy); // Store to disk
+
+            theRam.load(vpn, startAddr); // blockNum = VPN, startAddr = PFN * 64 or table_Size
+            theRam.write(physAddr, value); // Write to PhyMemory
+            theRam.store(vpn, startAddr); // Store to disk
             writeBackCounter++;
 
         }
@@ -107,12 +110,13 @@ public class VirtMemory extends Memory {
 
                 // Reload PhyMemory and adjust
                 if (evictTemp.evictPFN > 255 || evictTemp.evictPFN < 0) {
-
+                    // NOTE: FIX THIS IF STATEMENT BC IDK IF PFN ...
                     System.err.println("No such PFN");
 
                 }
-                pAddy = getThatPFN * 64 + offset;
-                theRam.load(vpn, pAddy);
+                // physAddr = getThatPFN * 64 + offset;
+                startAddr = evictTemp.evictPFN * 64;
+                theRam.load(vpn, startAddr);
                 hashTablePFN = hashTable.containsVPN(vpn);
                 return theRam.read(hashTablePFN);
 
@@ -120,7 +124,7 @@ public class VirtMemory extends Memory {
 
         }
 
-        return 0;
+        return -1;
     }
 
     @Override
@@ -129,18 +133,27 @@ public class VirtMemory extends Memory {
         int writeBackVPN;
         LinkedList<MyPageTable.PageTableEntry> tempDirtyList = new LinkedList<MyPageTable.PageTableEntry>();
         tempDirtyList = hashTable.returnDirtyList();
+        int countIndex = 0;
+        startAddr = tempDirtyList.get(countIndex).getPfn() * 64;
 
         // MAKE SURE WHEN WE CALL THIS WE RESET WRITEBACKCOUNTER = 0 AND WE NEED TO MAKE
         // A METHOD INSIDE OF PAGE TABLE TO CLEAR OUT DIRTYBIT LIST
 
         ListIterator<MyPageTable.PageTableEntry> iter = null;
         iter = tempDirtyList.listIterator();
-        int countIndex = 0;
+
+        theRam.load(tempDirtyList.get(countIndex).getVpn(), startAddr); // blockNum = VPN, startAddr = PFN * 64 or
+                                                                        // table_Size
         while (iter.hasNext()) {
-            writeBackVPN = tempDirtyList.get(countIndex).getVpn();
-            writeBackPFN = tempDirtyList.get(countIndex).getPFN();
+            // writeBackVPN = tempDirtyList.get(countIndex).getVpn();
+            // writeBackPFN = tempDirtyList.get(countIndex).getPFN();
+
+            // Store to disk
+            // ram.read? get byte?
+            // ram.write?
 
         }
+        theRam.store(tempDirtyList.get(countIndex).getVpn(), startAddr);
         writeBackCounter = 0;
         hashTable.resetDirtyList();
 

@@ -4,10 +4,11 @@ import java.util.Objects;
 
 public class MyPageTable {
 
-    private static int INITIAL_SIZE = 256;
+    private static int INITIAL_SIZE = 1024;
     // Correct way of
     LinkedList<PageTableEntry> temp[] = new LinkedList[INITIAL_SIZE];
     LinkedList<PageTableEntry> dirtyBits = new LinkedList<PageTableEntry>();
+    int index;
 
     static class PageTableEntry {
         int vpn;
@@ -40,14 +41,16 @@ public class MyPageTable {
     }
 
     public void addEntry(int vpn, PageTableEntry entry) {
-        temp[vpn].add(entry);
+        index = vpn % INITIAL_SIZE;
+        temp[index].add(entry);
         dirtyBits.add(entry);
+
     }
 
     public int containsVPN(int vpn) {
 
         ListIterator<PageTableEntry> iter = null;
-        PageTableEntry tempBoop = temp[vpn].getFirst(); // Sets the head to traverse
+        PageTableEntry tempBoop; // Sets the head to traverse
         int count = 0;
         iter = temp[vpn].listIterator(); // Sets iter to the temp to iterate
         while (iter.hasNext()) {
@@ -59,7 +62,7 @@ public class MyPageTable {
                 iter.next(); // Traverse if not
             }
         }
-        return -1;
+        return 0;
 
     }
 

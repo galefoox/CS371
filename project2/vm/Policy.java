@@ -8,7 +8,7 @@ public class Policy {
 
     int holdPFN;
     int maxFrames;
-    boolean dirty = false;
+    boolean dirty = true;
 
     public Policy(int maxFrames) {
         this.maxFrames = maxFrames;
@@ -17,18 +17,22 @@ public class Policy {
     protected VirtMemory.EvictionStatus advise() {
 
         if (queue.size() != maxFrames) { // It will never be more because we will remove in else
-
+            holdPFN = queue.size();
             queue.add(queue.size());
             // holdPFN = queue.peek();
-            holdPFN = queue.size();
+
         } else {
 
             holdPFN = queue.remove(); // so this evicts but now we need to add to front
-            dirty = true;
+            dirty = false;
             queue.add(holdPFN);
         }
 
         return new VirtMemory.EvictionStatus(holdPFN, dirty);
 
+    }
+
+    protected int getCurrentPFN() {
+        return holdPFN;
     }
 }

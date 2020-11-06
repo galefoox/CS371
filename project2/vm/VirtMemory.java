@@ -52,6 +52,7 @@ public class VirtMemory extends Memory {
         }
 
         else {
+
             /*
              * 20201104 TEST 3/4 THERE NEEDS TO BE AN IF ELSE STATEMENT TO DETERMINE WHICH
              * BLOCK IT IS IN AND DEPENDING ON WHICH BLOCK IT IS IT, WE WILL LOAD THAT BLOCK
@@ -62,6 +63,13 @@ public class VirtMemory extends Memory {
              * THE ONLY ISSUE WOULD PROBABLY BE THE # OF WRITE COUNTS AND READ COUNTS FOR
              * TEST 3 WALK THROUGH AND DOUBLE CHECK TO SEE IF THE LISTS ARE ACTUALLY BEING
              * PUT INTO IT CORRECTLY
+             * 
+             * IF THE NEXT ADDRESS ISN'T WITHIN THIS CURRENT BLOCK, THEN LOAD AGAIN AND
+             * WRITE THEN STORE
+             * 
+             * IF IT IS WITHIN THE SAME BLOCK, YOU DON'T HAVE TO LOAD AND STORE SO MANY
+             * TIMES
+             * 
              */
 
             evictTemp = policyPFN.advise();
@@ -100,7 +108,8 @@ public class VirtMemory extends Memory {
             System.err.println("Out of Bounds");
         }
 
-        else {
+        else { // Has to be an else if statement that will check if the VPN is within that
+               // block, else load another block
 
             hashTablePFN = hashTable.containsVPN(vpn);
 
@@ -111,12 +120,6 @@ public class VirtMemory extends Memory {
                 // Find a PFN to use
 
                 evictTemp = policyPFN.advise();
-
-                // Put inside PTE
-                // MyPageTable.PageTableEntry tableEntry = new MyPageTable.PageTableEntry(vpn,
-                // evictTemp.evictPFN,
-                // evictTemp.dirtyBit);
-                // hashTable.addEntry(index, tableEntry);
 
                 // Reload PhyMemory and adjust
                 if (evictTemp.evictPFN > 255 || evictTemp.evictPFN < 0) {
@@ -149,26 +152,30 @@ public class VirtMemory extends Memory {
 
             // MAKE SURE WHEN WE CALL THIS WE RESET WRITEBACKCOUNTER = 0 AND WE NEED TO MAKE
             // A METHOD INSIDE OF PAGE TABLE TO CLEAR OUT DIRTYBIT LIST
-            startAddr = tempDirtyList.get(countIndex).getPfn() * 64;
+            // startAddr = tempDirtyList.get(countIndex).getPfn() * 64;
             ListIterator<MyPageTable.PageTableEntry> iter = null;
             iter = tempDirtyList.listIterator();
 
-            theRam.load(tempDirtyList.get(countIndex).getVpn(), startAddr); // blockNum = VPN, startAddr = PFN * 64 or
-            currentBlock = tempDirtyList.get(countIndex).getVpn() / 64; // table_Size
+            // theRam.load(tempDirtyList.get(countIndex).getVpn(), startAddr); // blockNum =
+            // VPN, startAddr = PFN * 64 or
+            // currentBlock = 0; // table_Size
             while (iter.hasNext()) {
-                // writeBackVPN = tempDirtyList.get(countIndex).getVpn();
+
                 writeBackPFN = tempDirtyList.get(countIndex).getPfn();
                 writeBackVPN = tempDirtyList.get(countIndex).getVpn();
                 offset = (writeBackVPN * 64) % 64;
                 physAddr = writeBackPFN * 64 + offset;
-                Byte temp = ram.read(physAddr);
-                ram.write(physAddr, temp);
-                countIndex++;
-                blockNum = writeBackVPN / 64;
-                if (blockNum != currentBlock) {
-                    startAddr = tempDirtyList.get(countIndex).getPfn() * 64;
+                // Byte temp = theRam.read(physAddr);
+                // theRam.write(physAddr, temp);
+                // countIndex++;
+
+                if (physAddr > startAddr && physAddr > startAddr + 63) {
+                    startAddr = tempDirtyList.get(countIndex).getPfn() * 64; // + 64? Because we're going to look
+                                                                             // at the next block which is 64 byte
+                                                                             // // after the first
                     theRam.store(currentBlock, startAddr);
-                    currentBlock = blockNum;
+                    // currentBlock++; // Uhh double check if it's in the correct block
+                    startAddr += 64;
 
                 }
 
@@ -181,7 +188,7 @@ public class VirtMemory extends Memory {
             // Depending on the VPN, it will determine which block, so for example
             // VPN = 5, then it is in block 0-64 or block 0 because it goes from
             // VPN = 0 - 63
-            theRam.store(currentBlock, startAddr);
+            // theRam.store(currentBlock, startAddr);
             writeBackCounter = 0;
             hashTable.resetDirtyList();
         }

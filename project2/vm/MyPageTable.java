@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class MyPageTable {
 
-    private static int INITIAL_SIZE = 1024;
+    private static int INITIAL_SIZE = 256;
     // Correct way of
     LinkedList<PageTableEntry> temp[] = new LinkedList[INITIAL_SIZE];
     LinkedList<PageTableEntry> dirtyBits = new LinkedList<PageTableEntry>();
@@ -52,9 +52,10 @@ public class MyPageTable {
         ListIterator<PageTableEntry> iter = null;
         PageTableEntry tempBoop; // Sets the head to traverse
         int count = 0;
-        iter = temp[vpn].listIterator(); // Sets iter to the temp to iterate
+        index = vpn % INITIAL_SIZE;
+        iter = temp[index].listIterator(); // Sets iter to the temp to iterate
         while (iter.hasNext()) {
-            tempBoop = temp[vpn].get(count);
+            tempBoop = temp[index].get(count);
             if (tempBoop.vpn == vpn) { // If VPN matches then find the PFN
                 return tempBoop.pfn; // Return PFN
             } else {
@@ -62,7 +63,7 @@ public class MyPageTable {
                 iter.next(); // Traverse if not
             }
         }
-        return 0;
+        return -1;
 
     }
 

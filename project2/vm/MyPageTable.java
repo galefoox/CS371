@@ -43,8 +43,15 @@ public class MyPageTable {
     public void addEntry(int vpn, PageTableEntry entry) {
         index = vpn % INITIAL_SIZE;
         temp[index].add(entry);
-        dirtyBits.add(entry);
 
+    }
+
+    public void addDirtyEntry(PageTableEntry entry) {
+        dirtyBits.add(entry);
+    }
+
+    public void removeEntry(PageTableEntry entry) {
+        dirtyBits.remove(entry);
     }
 
     public int containsVPN(int vpn) {
@@ -67,22 +74,22 @@ public class MyPageTable {
 
     }
 
-    public void printAll() {
-        System.out.println(temp.length); // Length of the array
-        System.out.println(temp[1].size()); // # of nodes inside each index
-
-        // ITERATES THROUGH THE WHOLE LIST
-        // ListIterator<PageTableEntry> iter = null;
-        // for (int i = 0; i < table.length; i++) {
-        // }
-        // iter = entries.listIterator();
-        // while (iter.hasNext()) {
-        // System.out.println(iter.next());
-        // }
-
-        System.out.println("Table Entry 1: " + temp[1].toString());
-        System.out.println("Table Entry 8: " + temp[8].toString());
-
+    public int getVPN(int PFN, int vpn) {
+        ListIterator<PageTableEntry> iter = null;
+        PageTableEntry tempboop1;
+        int count = 0;
+        index = vpn % INITIAL_SIZE;
+        iter = temp[index].listIterator();
+        while (iter.hasNext()) {
+            tempboop1 = temp[index].get(count);
+            if (tempboop1.pfn == PFN) {
+                return tempboop1.vpn;
+            } else {
+                count++;
+                iter.next();
+            }
+        }
+        return -1;
     }
 
     protected LinkedList<PageTableEntry> returnDirtyList() {
@@ -91,6 +98,24 @@ public class MyPageTable {
 
     protected void resetDirtyList() {
         dirtyBits.clear();
+    }
+
+    protected void resetDirtyBits(int vpn) {
+        ListIterator<PageTableEntry> iter = null;
+        PageTableEntry tempBoop3; // Sets the head to traverse
+        int count = 0;
+        index = vpn % INITIAL_SIZE;
+        iter = temp[index].listIterator(); // Sets iter to the temp to iterate
+        while (iter.hasNext()) {
+            tempBoop3 = temp[index].get(count);
+            if (tempBoop3.vpn == vpn) { // If VPN matches then find the PFN
+                tempBoop3.dirtyBit = false;
+                iter.next(); // Return PFN
+            } else {
+                count++;
+                iter.next(); // Traverse if not
+            }
+        }
     }
 
 }

@@ -8,7 +8,7 @@ public class Policy {
 
     int holdPFN;
     int maxFrames;
-    boolean dirty = true;
+    boolean evictStatus = false;
     int policyVpn = -1;
 
     public Policy(int maxFrames) {
@@ -23,23 +23,23 @@ public class Policy {
             if (queue.size() != maxFrames) { // It will never be more because we will remove in else
                 holdPFN = queue.size();
                 queue.add(queue.size());
-                // holdPFN = queue.peek();
 
             } else {
 
-                holdPFN = queue.remove(); // so this evicts but now we need to add to front
-                dirty = false;
-                queue.add(holdPFN);
+                holdPFN = queue.remove(); // we get the head
+                evictStatus = true;
+                queue.add(holdPFN); // add back to tail
             }
 
         }
         policyVpn = blockNum;
 
-        return new VirtMemory.EvictionStatus(holdPFN, dirty);
+        return new VirtMemory.EvictionStatus(holdPFN, evictStatus);
 
     }
 
     protected int getCurrentPFN() {
         return holdPFN;
     }
+
 }

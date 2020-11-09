@@ -37,6 +37,7 @@ public class VirtMemory extends Memory {
     int writeBackCounter = 0;
     int offset;
     int blockNum = -1;
+    int readBlockNum = -1;
     int currentBlock;
     int blockAddy;
     int matchingVPN;
@@ -50,7 +51,7 @@ public class VirtMemory extends Memory {
 
         // Consider pagefault
 
-        if (address >= 64 * 1024) {
+        if (address >= 1024 * 64) {
             System.err.print("Out of Bounds");
         }
 
@@ -59,33 +60,33 @@ public class VirtMemory extends Memory {
             MyPageTable.PageTableEntry oof = new MyPageTable.PageTableEntry(vpn, evictTemp.evictPFN, true);
             physAddr = evictTemp.evictPFN * 64 + offset;
             if (evictTemp.evictStatus == true) { // This is for eviction
-                startAddr = policyPFN.getCurrentPFN() * 64;
-                matchingVPN = hashTable.getVPN(evictTemp.evictPFN, vpn);
-                theRam.store(matchingVPN, startAddr);
-                hashTable.removeEntry(oof);
+                if (blockNum != vpn) {
+                    hashTable.removeHead(vpn);
+
+                }
+
             }
 
-            // PUT INSIDE PTE
-            hashTable.addEntry(vpn, oof);
             hashTable.addDirtyEntry(oof);
-
             if (vpn == blockNum) { // Write if it's to the same block
 
                 theRam.write(physAddr, value);
 
             } else { // Load another block and write to that block
+                startAddr = policyPFN.getCurrentPFN() * 64; // We had an issue because this didn't exist
                 theRam.load(vpn, startAddr);
-
+                hashTable.addEntry(vpn, oof);
                 theRam.write(physAddr, value);
             }
 
-            // table_Size
-            // Write to PhyMemory
-            blockNum = vpn;
             writeBackCounter++;
             if (writeBackCounter == 32) {
                 write_back();
+                // hashTable.removeEntry(vpn, oof);
             }
+            // table_Size
+            // Write to PhyMemory
+            blockNum = vpn;
 
         }
 
@@ -96,7 +97,8 @@ public class VirtMemory extends Memory {
 
         int offset = virtAddy % 64; // HashCode
         int vpn = virtAddy / 64;
-        int hashTablePFN;
+        int hashTablePFN = hashTable.containsVPN(vpn);
+        int currentPFN = policyPFN.getCurrentPFN();
 
         if (virtAddy > virtSize) {
 
@@ -105,45 +107,38 @@ public class VirtMemory extends Memory {
 
         else {
 
-            hashTablePFN = hashTable.containsVPN(vpn);
-            startAddr = evictTemp.evictPFN * 64;
-            if (hashTablePFN == -1) {
+            if (!hashTable.check(vpn)) {
 
-                System.err.println("Page Fault"); // Cache Miss
+                System.err.println("Page Fault");
 
                 // Find a PFN to use
-
+                // bytheRam.load(vpn, startAddr);
                 evictTemp = policyPFN.advise(vpn);
                 MyPageTable.PageTableEntry oof = new MyPageTable.PageTableEntry(vpn, evictTemp.evictPFN, true);
                 if (evictTemp.evictStatus == true) { // This is for eviction
-                    startAddr = policyPFN.getCurrentPFN() * 64;
-                    matchingVPN = hashTable.getVPN(evictTemp.evictPFN, vpn);
-                    theRam.store(matchingVPN, startAddr);
-                    hashTable.removeEntry(oof);// remove from dirtyList
+                    // EVICT THE HEAD of PTE
+                    hashTable.removeHead(vpn);
+                    hashTable.addEntry(vpn, oof);
+                    if (hashTable.check(vpn)) {
+                        hashTablePFN = hashTable.containsVPN(vpn);
+                        startAddr = hashTablePFN * 64;
+                        theRam.load(vpn, startAddr);
+                    }
+
+                    physAddr = hashTablePFN * 64 + offset;
+
+                    return theRam.read(physAddr);
+
                 }
-                hashTable.addEntry(vpn, oof);
-                hashTablePFN = hashTable.containsVPN(vpn);
-                startAddr = evictTemp.evictPFN * 64;
-                theRam.load(vpn, startAddr);
-                physAddr = hashTablePFN * 64 + offset;
-
-                // // startAddr = policyPFN.getCurrentPFN() * 64; // Get the Previous PFN
-                // theRam.load(vpn, startAddr);
-                // physAddr = evictTemp.evictPFN * 64 + offset;
-                // startAddr = evictTemp.evictPFN * 64; // no offset
-
-                return theRam.read(physAddr);
 
             } else {
-                startAddr = hashTablePFN * 64;
-                theRam.load(vpn, startAddr);
                 physAddr = hashTablePFN * 64 + offset;
                 return theRam.read(physAddr);
             }
-
         }
 
         return -1;
+
     }
 
     @Override

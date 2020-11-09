@@ -126,11 +126,13 @@ public class VirtMemoryTest {
         Memory m = new VirtMemory();
         m.startup();
         boolean result = true;
+
         for (int i = 0; i < TEST_SIZE; i++)
             m.write(i, fce(i));
         for (int i = TEST_SIZE - 1; i >= 0; i--)
             if (m.read(i) != fce(i))
                 result = false;
+
         assertEquals(true, result);
         m.shutdown();
         assertEquals(2048, m.getPhyMemory().writeCountDisk());

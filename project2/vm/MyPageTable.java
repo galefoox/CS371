@@ -50,8 +50,9 @@ public class MyPageTable {
         dirtyBits.add(entry);
     }
 
-    public void removeEntry(PageTableEntry entry) {
-        dirtyBits.remove(entry);
+    public void removeHead(int vpn) {
+        index = vpn % INITIAL_SIZE;
+        temp[index].remove();
     }
 
     public int containsVPN(int vpn) {
@@ -116,6 +117,24 @@ public class MyPageTable {
                 iter.next(); // Traverse if not
             }
         }
+    }
+
+    public boolean check(int vpn) {
+        ListIterator<PageTableEntry> iter = null;
+        PageTableEntry tempboop1;
+        int count = 0;
+        index = vpn % INITIAL_SIZE;
+        iter = temp[index].listIterator();
+        while (iter.hasNext()) {
+            tempboop1 = temp[index].get(count);
+            if (tempboop1.vpn == vpn) {
+                return true;
+            } else {
+                count++;
+                iter.next();
+            }
+        }
+        return false;
     }
 
 }

@@ -55,17 +55,17 @@ public class MyPageTable {
         temp[index].remove();
     }
 
-    public int containsVPN(int vpn) {
+    public int matchingPFN(int vpn) {
 
         ListIterator<PageTableEntry> iter = null;
-        PageTableEntry tempBoop; // Sets the head to traverse
+        PageTableEntry tempEntry; // Sets the head to traverse
         int count = 0;
         index = vpn % INITIAL_SIZE;
         iter = temp[index].listIterator(); // Sets iter to the temp to iterate
         while (iter.hasNext()) {
-            tempBoop = temp[index].get(count);
-            if (tempBoop.vpn == vpn) { // If VPN matches then find the PFN
-                return tempBoop.pfn; // Return PFN
+            tempEntry = temp[index].get(count);
+            if (tempEntry.vpn == vpn) { // If VPN matches then find the PFN
+                return tempEntry.pfn; // Return PFN
             } else {
                 count++;
                 iter.next(); // Traverse if not
@@ -73,24 +73,6 @@ public class MyPageTable {
         }
         return -1;
 
-    }
-
-    public int getVPN(int PFN, int vpn) {
-        ListIterator<PageTableEntry> iter = null;
-        PageTableEntry tempboop1;
-        int count = 0;
-        index = vpn % INITIAL_SIZE;
-        iter = temp[index].listIterator();
-        while (iter.hasNext()) {
-            tempboop1 = temp[index].get(count);
-            if (tempboop1.pfn == PFN) {
-                return tempboop1.vpn;
-            } else {
-                count++;
-                iter.next();
-            }
-        }
-        return -1;
     }
 
     protected LinkedList<PageTableEntry> returnDirtyList() {
@@ -103,14 +85,14 @@ public class MyPageTable {
 
     protected void resetDirtyBits(int vpn) {
         ListIterator<PageTableEntry> iter = null;
-        PageTableEntry tempBoop3; // Sets the head to traverse
+        PageTableEntry tempEntry; // Sets the head to traverse
         int count = 0;
         index = vpn % INITIAL_SIZE;
         iter = temp[index].listIterator(); // Sets iter to the temp to iterate
         while (iter.hasNext()) {
-            tempBoop3 = temp[index].get(count);
-            if (tempBoop3.vpn == vpn) { // If VPN matches then find the PFN
-                tempBoop3.dirtyBit = false;
+            tempEntry = temp[index].get(count);
+            if (tempEntry.vpn == vpn) { // If VPN matches then find the PFN
+                tempEntry.dirtyBit = false;
                 iter.next(); // Return PFN
             } else {
                 count++;
@@ -119,15 +101,15 @@ public class MyPageTable {
         }
     }
 
-    public boolean check(int vpn) {
+    public boolean checkForVPN(int vpn) {
         ListIterator<PageTableEntry> iter = null;
-        PageTableEntry tempboop1;
+        PageTableEntry tempEntry;
         int count = 0;
         index = vpn % INITIAL_SIZE;
         iter = temp[index].listIterator();
         while (iter.hasNext()) {
-            tempboop1 = temp[index].get(count);
-            if (tempboop1.vpn == vpn) {
+            tempEntry = temp[index].get(count);
+            if (tempEntry.vpn == vpn) {
                 return true;
             } else {
                 count++;
